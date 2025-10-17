@@ -14,6 +14,12 @@ urlpatterns = [
         path('admin/', users.AdminView.as_view()),
     #Admin Data
         path('lista-admins/', users.AdminAll.as_view()),
+    #Create Alumno
+        path('alumnos/', users.AlumnosView.as_view()),
+        path('alumnos/<int:pk>/', users.AlumnoDetailView.as_view()),
+    #Create Maestro
+        path('maestros/', users.MaestrosView.as_view()),
+        path('maestros/<int:pk>/', users.MaestroDetailView.as_view()),
     #Edit Admin
         #path('admins-edit/', users.AdminsViewEdit.as_view())
 ]
