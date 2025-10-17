@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views.bootstrap import VersionView
 from app_movil_escolar_api.views import bootstrap
-from app_movil_escolar_api.views import users
+from app_movil_escolar_api.views import users, alumnos, maestros
 from app_movil_escolar_api.views import auth
 # from sistema_escolar_api.views import alumnos
 # from sistema_escolar_api.views import maestros
@@ -15,11 +15,11 @@ urlpatterns = [
     #Admin Data
         path('lista-admins/', users.AdminAll.as_view()),
     #Create Alumno
-        path('alumnos/', users.AlumnosView.as_view()),
-        path('alumnos/<int:pk>/', users.AlumnoDetailView.as_view()),
+        path('alumnos/', alumnos.AlumnosView.as_view()),
+        path('alumnos/<int:pk>/', alumnos.AlumnoDetailView.as_view()),
     #Create Maestro
-        path('maestros/', users.MaestrosView.as_view()),
-        path('maestros/<int:pk>/', users.MaestroDetailView.as_view()),
+        path('maestros/', maestros.MaestrosView.as_view()),
+        path('maestros/<int:pk>/', maestros.MaestroDetailView.as_view()),
     #Edit Admin
         #path('admins-edit/', users.AdminsViewEdit.as_view())
 ]
