@@ -1,175 +1,24 @@
-from django.db.models import *
 from django.db import transaction
-from dev_sistema_escolar_api.serializers import UserSerializer
-from dev_sistema_escolar_api.serializers import *
-from dev_sistema_escolar_api.models import *
-from rest_framework import permissions
-from rest_framework import generics
-from rest_framework import status
+from rest_framework import permissions, generics, status
 from rest_framework.response import Response
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 
-class Userme(generics.CreateAPIView):
+from dev_sistema_escolar_api.serializers import UserSerializer
+from dev_sistema_escolar_api.models import *
+
+class UserMe(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request, *args, **kwargs):
         user = request.user
-        #TODO: Regresar perfil del usuario
-        return Response({})
-
-class AdminView(generics.CreateAPIView):
-    #Registrar nuevo usuario
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-
-        # Serializamos los datos del administrador para volverlo de nuevo JSON
-        user = UserSerializer(data=request.data)
-        
-        if user.is_valid():
-            #Grab user data
-            role = request.data['rol']
-            first_name = request.data['first_name']
-            last_name = request.data['last_name']
-            email = request.data['email']
-            password = request.data['password']
-            #Valida si existe el usuario o bien el email registrado
-            existing_user = User.objects.filter(email=email).first()
-
-            if existing_user:
-                return Response({"message":"Username "+email+", is already taken"},400)
-
-            user = User.objects.create( username = email,
-                                        email = email,
-                                        first_name = first_name,
-                                        last_name = last_name,
-                                        is_active = 1)
-
-
-            user.save()
-            #Cifrar la contraseña
-            user.set_password(password)
-            user.save()
-
-            group, created = Group.objects.get_or_create(name=role)
-            group.user_set.add(user)
-            user.save()
-
-            #Almacenar los datos adicionales del administrador
-            admin = Administradores.objects.create(user=user,
-                                            clave_admin= request.data["clave_admin"],
-                                            telefono= request.data["telefono"],
-                                            rfc= request.data["rfc"].upper(),
-                                            edad= request.data["edad"],
-                                            ocupacion= request.data["ocupacion"])
-            admin.save()
-
-            return Response({"admin_created_id": admin.id }, 201)
-
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# Vista para Estudiante
-
-class EstudianteView(generics.CreateAPIView):
-    #Registrar nuevo usuario
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-
-        # Serializamos los datos del maestro para volverlo de nuevo JSON
-        user = UserSerializer(data=request.data)
-        
-        if user.is_valid():
-            #Grab user data
-            role = request.data['rol']
-            first_name = request.data['first_name']
-            last_name = request.data['last_name']
-            email = request.data['email']
-            password = request.data['password']
-            #Valida si existe el usuario o bien el email registrado
-            existing_user = User.objects.filter(email=email).first()
-
-            if existing_user:
-                return Response({"message":"Username "+email+", is already taken"},400)
-
-            user = User.objects.create( username = email,
-                                        email = email,
-                                        first_name = first_name,
-                                        last_name = last_name,
-                                        is_active = 1)
-
-
-            user.save()
-            #Cifrar la contraseña
-            user.set_password(password)
-            user.save()
-
-            group, created = Group.objects.get_or_create(name=role)
-            group.user_set.add(user)
-            user.save()
-
-            #Almacenar los datos adicionales del estudiante
-            estudiante = Estudiantes.objects.create(user=user,
-                                            matricula= request.data["matricula"],
-                                            fecha_nacimiento= request.data["fecha_nacimiento"],
-                                            curp= request.data["curp"].upper(),
-                                            rfc= request.data["rfc"].upper(),
-                                            edad= request.data["edad"],
-                                            telefono= request.data["telefono"],
-                                            ocupacion= request.data["ocupacion"])
-            estudiante.save()
-
-            return Response({"estudiante_created_id": estudiante.id }, 201)
-
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-# Vista para Maestro    
-class MaestroView(generics.CreateAPIView):
-    #Registrar nuevo usuario
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-
-        # Serializamos los datos del maestro para volverlo de nuevo JSON
-        user = UserSerializer(data=request.data)
-        
-        if user.is_valid():
-            #Grab user data
-            role = request.data['rol']
-            first_name = request.data['first_name']
-            last_name = request.data['last_name']
-            email = request.data['email']
-            password = request.data['password']
-            #Valida si existe el usuario o bien el email registrado
-            existing_user = User.objects.filter(email=email).first()
-
-            if existing_user:
-                return Response({"message":"Username "+email+", is already taken"},400)
-
-            user = User.objects.create( username = email,
-                                        email = email,
-                                        first_name = first_name,
-                                        last_name = last_name,
-                                        is_active = 1)
-
-
-            user.save()
-            #Cifrar la contraseña
-            user.set_password(password)
-            user.save()
-
-            group, created = Group.objects.get_or_create(name=role)
-            group.user_set.add(user)
-            user.save()
-
-            #Almacenar los datos adicionales del maestro
-            maestro = Maestros.objects.create(user=user,
-                                            id_trabajador= request.data["id_trabajador"],
-                                            fecha_nacimiento= request.data["fecha_nacimiento"],
-                                            telefono= request.data["telefono"],
-                                            rfc= request.data["rfc"].upper(),
-                                            cubiculo= request.data["cubiculo"],
-                                            area_investigacion= request.data["area_investigacion"],
-                                            materias_json= request.data["materias_json"]
-                )
-            maestro.save()
-
-            return Response({"maestro_created_id": maestro.id }, 201)
-
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+        # TODO: Regresar perfil del usuario (si tienes modelos de perfil por rol, puedes detectarlos aquí)
+        data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "is_active": user.is_active,
+            "groups": list(user.groups.values_list("name", flat=True)),
+        }
+        return Response(data, status=status.HTTP_200_OK)
