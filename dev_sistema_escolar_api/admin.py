@@ -4,6 +4,8 @@ from dev_sistema_escolar_api.models import *
 
 
 @admin.register(Administradores)
+@admin.register(Maestros)
+@admin.register(Alumnos)
 
 class ProfilesAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "creation", "update")

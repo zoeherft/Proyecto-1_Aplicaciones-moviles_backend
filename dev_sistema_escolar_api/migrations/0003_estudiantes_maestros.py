@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Estudiantes',
+            name='Alumnos',
             fields=[
                 ('id', models.BigAutoField(primary_key=True, serialize=False)),
                 ('matricula', models.CharField(max_length=50, unique=True)),

@@ -1,10 +1,18 @@
 from django.db import transaction
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 
-from dev_sistema_escolar_api.serializers import UserSerializer
+from dev_sistema_escolar_api.serializers import UserSerializer, AdminSerializer
 from dev_sistema_escolar_api.models import Administradores
+
+class AdminsAll(generics.CreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        admins = Administradores.objects.filter(user__is_active=1).order_by('id')
+        serializer = AdminSerializer(admins, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AdminView(generics.CreateAPIView):
     """

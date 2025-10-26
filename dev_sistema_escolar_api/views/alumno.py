@@ -1,14 +1,23 @@
 from django.db import transaction
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 
-from dev_sistema_escolar_api.serializers import UserSerializer
-from dev_sistema_escolar_api.models import Estudiantes
+from dev_sistema_escolar_api.serializers import UserSerializer , AlumnoSerializer
+from dev_sistema_escolar_api.models import Alumnos
 
-class EstudianteView(generics.CreateAPIView):
+class AlumnosAll(generics.CreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        alumnos = Alumnos.objects.filter(user__is_active=1).order_by('id')
+        serializer = AlumnoSerializer(alumnos, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class AlumnoView(generics.CreateAPIView):
     """
-    Registrar nuevo Estudiante + crear usuario auth y asignar rol (Group).
+    Registrar nuevo Alumno + crear usuario auth y asignar rol (Group).
     """
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -43,8 +52,8 @@ class EstudianteView(generics.CreateAPIView):
         group, _ = Group.objects.get_or_create(name=role)
         group.user_set.add(user)
 
-        # Datos específicos de Estudiante
-        estudiante = Estudiantes.objects.create(
+        # Datos específicos de Alumno
+        Alumno = Alumnos.objects.create(
             user=user,
             matricula=request.data.get("matricula"),
             fecha_nacimiento=request.data.get("fecha_nacimiento"),
@@ -54,6 +63,6 @@ class EstudianteView(generics.CreateAPIView):
             telefono=request.data.get("telefono"),
             ocupacion=request.data.get("ocupacion"),
         )
-        estudiante.save()
+        Alumno.save()
 
-        return Response({"estudiante_created_id": estudiante.id}, status=201)
+        return Response({"Alumno_created_id": Alumno.id}, status=201)

@@ -18,10 +18,10 @@ class AdminSerializer(serializers.ModelSerializer):
         model = Administradores
         fields = '__all__'
 
-class EstudianteSerializer(serializers.ModelSerializer):
+class AlumnoSerializer(serializers.ModelSerializer):
     user=UserSerializer(read_only=True)
     class Meta:
-        model = Estudiantes
+        model = Alumnos
         fields = '__all__'
 
 class MaestroSerializer(serializers.ModelSerializer):

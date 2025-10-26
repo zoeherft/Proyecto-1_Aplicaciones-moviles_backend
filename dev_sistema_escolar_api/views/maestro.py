@@ -1,10 +1,26 @@
 from django.db import transaction
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 
-from dev_sistema_escolar_api.serializers import UserSerializer
+from dev_sistema_escolar_api.serializers import UserSerializer, MaestroSerializer
 from dev_sistema_escolar_api.models import Maestros
+import json
+
+class MaestrosAll(generics.CreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        maestros = Maestros.objects.filter(user__is_active=1).order_by('id')
+        maestros_lista = MaestroSerializer(maestros, many=True).data
+        for maestro in maestros_lista:
+            if isinstance(maestro,dict) and 'materias_json' in maestro:
+                try:
+                    maestro['materias_json'] = json.loads(maestro['materias_json'])
+                except Exception:
+                    maestro['materias_json'] = []
+        return Response(maestros_lista, status=status.HTTP_200_OK)
+
 
 class MaestroView(generics.CreateAPIView):
     """
@@ -51,6 +67,7 @@ class MaestroView(generics.CreateAPIView):
             telefono=request.data.get("telefono"),
             rfc=request.data.get("rfc", "").upper(),
             cubiculo=request.data.get("cubiculo"),
+            edad=request.data.get("edad"),
             area_investigacion=request.data.get("area_investigacion"),
             materias_json=request.data.get("materias_json"),
         )
