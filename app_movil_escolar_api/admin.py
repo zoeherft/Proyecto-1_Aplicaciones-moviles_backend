@@ -6,8 +6,15 @@ from django.utils.html import format_html
 from app_movil_escolar_api.models import *
 
 
+<<<<<<< HEAD
 # Registra simultáneamente los modelos Administradores, Alumnos y Maestros en el sitio admin.
 @admin.register(Administradores, Alumnos, Maestros)
+=======
+@admin.register(Administradores)
+@admin.register(Alumnos)
+@admin.register(Maestros)
+
+>>>>>>> upstream/master
 class ProfilesAdmin(admin.ModelAdmin):
     # Define qué columnas se mostrarán en la lista principal del admin para estos modelos.
     list_display = ("id", "user", "creation", "last_update")
