@@ -30,15 +30,6 @@ class Administradores(models.Model):
 class Alumnos(models.Model):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, default=None)
-<<<<<<< HEAD
-    matricula = models.CharField(max_length=255, null=True, blank=True)
-    telefono = models.CharField(max_length=255, null=True, blank=True)
-    fecha_nacimiento = models.DateField(null=True, blank=True)
-    curp = models.CharField(max_length=255, null=True, blank=True)
-    rfc = models.CharField(max_length=255, null=True, blank=True)
-    edad = models.IntegerField(null=True, blank=True)
-    ocupacion = models.CharField(max_length=255, null=True, blank=True)
-=======
     matricula = models.CharField(max_length=255,null=True, blank=True)
     curp = models.CharField(max_length=255,null=True, blank=True)
     rfc = models.CharField(max_length=255,null=True, blank=True)
@@ -46,30 +37,11 @@ class Alumnos(models.Model):
     edad = models.IntegerField(null=True, blank=True)
     telefono = models.CharField(max_length=255, null=True, blank=True)
     ocupacion = models.CharField(max_length=255,null=True, blank=True)
->>>>>>> upstream/master
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return "Perfil del alumno "+self.user.first_name+" "+self.user.last_name
-<<<<<<< HEAD
-
-
-class Maestros(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, default=None)
-    telefono = models.CharField(max_length=255, null=True, blank=True)
-    id_trabajador = models.CharField(max_length=255, null=True, blank=True)
-    fecha_nacimiento = models.DateField(null=True, blank=True)
-    rfc = models.CharField(max_length=255, null=True, blank=True)
-    cubiculo = models.CharField(max_length=255, null=True, blank=True)
-    area_investigacion = models.TextField(null=True, blank=True)
-    materias_json = models.JSONField(default=list, blank=True)
-    creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-
-    def __str__(self):
-        return "Perfil del maestro "+self.user.first_name+" "+self.user.last_name
-=======
     
 class Maestros(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -87,4 +59,3 @@ class Maestros(models.Model):
 
     def __str__(self):
         return "Perfil del maestro "+self.user.first_name+" "+self.user.last_name   
->>>>>>> upstream/master

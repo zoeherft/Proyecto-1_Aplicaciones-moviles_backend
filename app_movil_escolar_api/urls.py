@@ -4,13 +4,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views.bootstrap import VersionView
 from app_movil_escolar_api.views import bootstrap
-<<<<<<< HEAD
-from app_movil_escolar_api.views import users, alumnos, maestros
-=======
 from app_movil_escolar_api.views import users
 from app_movil_escolar_api.views import alumnos
 from app_movil_escolar_api.views import maestros
->>>>>>> upstream/master
 from app_movil_escolar_api.views import auth
 # from sistema_escolar_api.views import alumnos
 # from sistema_escolar_api.views import maestros
