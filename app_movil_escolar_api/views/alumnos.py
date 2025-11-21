@@ -17,6 +17,8 @@ class AlumnosAll(generics.CreateAPIView):
         alumnos = Alumnos.objects.filter(user__is_active = 1).order_by("id")
         lista = AlumnoSerializer(alumnos, many=True).data
         
+        print(lista)
+        
         return Response(lista, 200)
     
 class AlumnosView(generics.CreateAPIView):
