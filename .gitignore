@@ -52,7 +52,7 @@ Thumbs.db
 *.cnf
 
 # Django Migrations
-dev_sistema_escolar_api/migrations/
+app_movil_escolar_api/migrations/
 
 # SQL Config
 #*.cnf

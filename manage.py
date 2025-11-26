@@ -5,7 +5,7 @@ import sys
 
 
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dev_sistema_escolar_api.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app_movil_escolar_api.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

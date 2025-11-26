@@ -3,6 +3,7 @@
 Backend en Django destinado a cubrir los procesos basicos de un sistema escolar: administracion de usuarios (administradores, Alumnos y maestros), autenticacion por token y utilidades para cifrado, envio de correo y generacion de llaves. El proyecto se encuentra preparado para ejecutarse de manera local con MySQL y para desplegarse en Google App Engine.
 
 ## Tabla de contenidos
+
 - [Descripcion general](#descripcion-general)
 - [Tecnologias principales](#tecnologias-principales)
 - [Estructura del proyecto](#estructura-del-proyecto)
@@ -19,6 +20,7 @@ Backend en Django destinado a cubrir los procesos basicos de un sistema escolar:
 - [Siguientes pasos sugeridos](#siguientes-pasos-sugeridos)
 
 ## Descripcion general
+
 - Persistencia en MySQL mediante `pymysql`, con soporte Unicode (`utf8mb4`) y configuracion centralizada a traves de `my.cnf`.
 - API construida con Django REST Framework, orientada a crear perfiles y sesiones para personal administrativo, Alumnos y maestros.
 - Seguridad basada en tokens Bearer reutilizando `rest_framework.authtoken`.
@@ -26,6 +28,7 @@ Backend en Django destinado a cubrir los procesos basicos de un sistema escolar:
 - Cobertura de tareas auxiliares como cifrado simetrico de datos, generacion de codigos y envio asincrono de correo.
 
 ## Tecnologias principales
+
 - Python 3.12 (requerido por el `runtime` de App Engine).
 - Django 5.0.2 y Django REST Framework 3.16.
 - MySQL consumido via `pymysql`.
@@ -34,6 +37,7 @@ Backend en Django destinado a cubrir los procesos basicos de un sistema escolar:
 - Librerias adicionales: `cryptography`, `Pillow`, `requests`, `google-cloud-storage`.
 
 ## Estructura del proyecto
+
 ```
 backend/
   app.yaml                 # Configuracion para Google App Engine.
@@ -43,7 +47,7 @@ backend/
   my.cnf                   # Archivo de configuracion de cliente MySQL usado por Django.
   requirements.txt         # Dependencias del entorno virtual.
   static/                  # Archivos estaticos ya recolectados (admin y DRF).
-  dev_sistema_escolar_api/
+  app_movil_escolar_api/
     __init__.py            # Registra pymysql como backend MySQL.
     admin.py               # Configuracion del admin de Django (lista Administradores).
     models.py              # Modelos ORM (Administradores + autenticacion Bearer).
@@ -61,12 +65,14 @@ backend/
 ```
 
 ## Requisitos previos
+
 - Python 3.12 (instalado y disponible en PATH).
 - MySQL 8 (o compatible) corriendo localmente.
 - `pip` actualizado (por ejemplo `python -m pip install --upgrade pip`).
 - (Opcional) Google Cloud SDK (`gcloud`) configurado si se desea desplegar.
 
 ## Configuracion del entorno local
+
 1. Crear y activar un entorno virtual (recomendado):
    ```bash
    python -m venv .venv
@@ -81,14 +87,14 @@ backend/
    [client]
    host = 127.0.0.1
    port = 3306
-   database = dev_sistema_escolar_db
+   database = app_movil_escolar_db
    user = root
    password = TU_PASSWORD
    default-character-set = utf8mb4
    ```
 4. Crear la base de datos (solo la primera vez):
    ```sql
-   CREATE DATABASE dev_sistema_escolar_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE DATABASE app_movil_escolar_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
 5. Exportar las variables de entorno necesarias (ver seccion [Variables y secretos](#variables-y-secretos)):
    ```bash
@@ -111,31 +117,35 @@ backend/
    El proyecto quedara disponible en `http://localhost:8000/`.
 
 ## Variables y secretos
-| Variable | Descripcion | Notas |
-|----------|-------------|-------|
-| `SECRET_KEY` | Clave interna de Django. | Obligatoria en produccion; en desarrollo se usa la definida en `settings.py`. |
-| `CRYPTO_PASSWORD` | Password usado por `CypherUtils` para cifrar/descifrar strings. | Debe ser una cadena robusta; es requerida si se usan las utilidades de cifrado. |
-| `APP_VERSION` | Valor devuelto por `/api/version/`. | Permite exponer la version de build al frontend. |
-| `EMAIL_HOST`, `EMAIL_HOST_USER`, etc. | Variables tipicas de configuracion de correo de Django. | Necesarias para que `puentes/mail.py` pueda enviar emails. |
-| `DATABASE_URL` | No se usa. La conexion se define mediante `my.cnf`. | Asegura que el archivo `my.cnf` este presente y con permisos adecuados. |
+
+| Variable                              | Descripcion                                                     | Notas                                                                           |
+| ------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `SECRET_KEY`                          | Clave interna de Django.                                        | Obligatoria en produccion; en desarrollo se usa la definida en `settings.py`.   |
+| `CRYPTO_PASSWORD`                     | Password usado por `CypherUtils` para cifrar/descifrar strings. | Debe ser una cadena robusta; es requerida si se usan las utilidades de cifrado. |
+| `APP_VERSION`                         | Valor devuelto por `/api/version/`.                             | Permite exponer la version de build al frontend.                                |
+| `EMAIL_HOST`, `EMAIL_HOST_USER`, etc. | Variables tipicas de configuracion de correo de Django.         | Necesarias para que `puentes/mail.py` pueda enviar emails.                      |
+| `DATABASE_URL`                        | No se usa. La conexion se define mediante `my.cnf`.             | Asegura que el archivo `my.cnf` este presente y con permisos adecuados.         |
 
 > Consejo: En ambientes locales puedes colocar estas variables en un script `env.sh` y ejecutarlo con `source env.sh`. Para despliegues en App Engine se configuran en `app.yaml` o desde `gcloud app deploy --set-env-vars`.
 
 ## Modelos y migraciones
+
 - `Administradores`: Perfil con campos de identificacion basicos enlazado a la tabla `auth_user`. Soporta datos como clave interna, telefono, RFC, edad y ocupacion.
 - `BearerTokenAuthentication`: Subclase de `TokenAuthentication` que ajusta la palabra clave a `Bearer` para alinear la API con estandares modernos.
 - Migraciones `0003_Alumnos_maestros.py` agregan modelos `Alumnos` y `Maestros` con estructura detallada (matricula, CURP, RFC, etc.). Estos modelos aun no estan declarados en `models.py`; para evitar errores al importar vistas relacionadas es necesario definirlos en dicho archivo antes de usarlos en produccion.
 
 ## Vistas y endpoints
-Rutas expuestas actualmente en `dev_sistema_escolar_api/urls.py`:
 
-| Metodo | Ruta | Vista | Descripcion |
-|--------|------|-------|-------------|
-| `GET` | `/admin/` | Django admin | Panel administrativo estandar. |
-| `GET` | `/api-auth/login/` | DRF auth | Autenticacion basada en sesiones (para explorador DRF). |
-| `GET` | `/api/version/` | `VersionView` | Devuelve JSON con `{"version": APP_VERSION}`. |
+Rutas expuestas actualmente en `app_movil_escolar_api/urls.py`:
+
+| Metodo | Ruta               | Vista         | Descripcion                                             |
+| ------ | ------------------ | ------------- | ------------------------------------------------------- |
+| `GET`  | `/admin/`          | Django admin  | Panel administrativo estandar.                          |
+| `GET`  | `/api-auth/login/` | DRF auth      | Autenticacion basada en sesiones (para explorador DRF). |
+| `GET`  | `/api/version/`    | `VersionView` | Devuelve JSON con `{"version": APP_VERSION}`.           |
 
 Vistas preparadas pero aun no mapeadas:
+
 - `views.auth.CustomAuthToken`: Login por token (POST) que devuelve `token`, datos del usuario y roles.
 - `views.auth.Logout`: Revoca el token actual (GET) para un usuario autenticado.
 - `views.admin.AdminView`: Crea usuarios y perfiles de administradores.
@@ -143,12 +153,13 @@ Vistas preparadas pero aun no mapeadas:
 - `views.maestro.MaestroView`: Crea usuarios y perfiles de maestros.
 - `views.users.Userme`: Placeholder para obtener datos del usuario autenticado.
 
-Para activarlas, agrega las rutas correspondientes en `dev_sistema_escolar_api/urls.py`, por ejemplo:
+Para activarlas, agrega las rutas correspondientes en `app_movil_escolar_api/urls.py`, por ejemplo:
+
 ```python
-from dev_sistema_escolar_api.views.auth import CustomAuthToken, Logout
-from dev_sistema_escolar_api.views.admin import AdminView
-from dev_sistema_escolar_api.views.Alumno import AlumnoView
-from dev_sistema_escolar_api.views.maestro import MaestroView
+from app_movil_escolar_api.views.auth import CustomAuthToken, Logout
+from app_movil_escolar_api.views.admin import AdminView
+from app_movil_escolar_api.views.Alumno import AlumnoView
+from app_movil_escolar_api.views.maestro import MaestroView
 
 urlpatterns += [
     path("api/auth/login/", CustomAuthToken.as_view(), name="api-login"),
@@ -160,12 +171,14 @@ urlpatterns += [
 ```
 
 ## Autenticacion
+
 - Basada en `rest_framework.authtoken`. Cada usuario obtiene un token persistente almacenado en base de datos.
 - Las vistas protegidas por `BearerTokenAuthentication` esperan el header `Authorization: Bearer <token>`.
 - Para revocar tokens se usa `Logout`, que elimina el token asociado al usuario autenticado.
 - Las vistas de creacion de perfiles (`AdminView`, `AlumnoView`, `MaestroView`) generan usuarios en `auth_user`, asignan roles como `Group` y luego vinculan el perfil especifico.
 
 ## Utilidades y servicios internos
+
 - `cypher_utils.CypherUtils`: Cifrado y descifrado utilizando Fernet + PBKDF2. Se requiere `CRYPTO_PASSWORD`.
 - `data_utils.DataUtils`: Genera llaves de 4 bloques, strings numericos, detecta mimetypes basicos y valida URLs.
 - `utils.Utils`: Conversion de archivos a base64 y generacion de cadenas aleatorias.
@@ -173,23 +186,26 @@ urlpatterns += [
 - `views.bootstrap.VersionView`: Permite que el frontend obtenga la version actual del backend para diagnostico.
 
 ## Panel de administracion
+
 - Accesible en `/admin/`.
-- `dev_sistema_escolar_api/admin.py` registra el modelo `Administradores` con lista y filtros basicos.
+- `app_movil_escolar_api/admin.py` registra el modelo `Administradores` con lista y filtros basicos.
 - Recuerda crear un superusuario (`python manage.py createsuperuser`) para acceder.
 
 ## Comandos frecuentes
-| Comando | Uso |
-|---------|-----|
-| `python manage.py runserver` | Levantar el servidor local en `http://127.0.0.1:8000/`. |
-| `python manage.py migrate` | Aplicar migraciones pendientes. |
-| `python manage.py makemigrations` | Generar migraciones cuando se actualizan modelos. |
-| `python manage.py createsuperuser` | Crear un usuario administrador para el panel. |
-| `python manage.py shell` | Abrir shell interactiva con contexto de Django. |
-| `python manage.py collectstatic` | Copiar archivos estaticos a `STATIC_ROOT` (requerido para despliegues). |
+
+| Comando                            | Uso                                                                     |
+| ---------------------------------- | ----------------------------------------------------------------------- |
+| `python manage.py runserver`       | Levantar el servidor local en `http://127.0.0.1:8000/`.                 |
+| `python manage.py migrate`         | Aplicar migraciones pendientes.                                         |
+| `python manage.py makemigrations`  | Generar migraciones cuando se actualizan modelos.                       |
+| `python manage.py createsuperuser` | Crear un usuario administrador para el panel.                           |
+| `python manage.py shell`           | Abrir shell interactiva con contexto de Django.                         |
+| `python manage.py collectstatic`   | Copiar archivos estaticos a `STATIC_ROOT` (requerido para despliegues). |
 
 > Por ahora no existen pruebas automatizadas en el repositorio. Para iniciarlas puedes ejecutar `python manage.py test` como base al agregarlas.
 
 ## Despliegue en Google App Engine
+
 1. Asegurate de tener `gcloud` instalado y autenticarte:
    ```bash
    gcloud auth login
@@ -208,6 +224,7 @@ urlpatterns += [
    ```
 
 ## Siguientes pasos sugeridos
+
 1. Declarar en `models.py` las clases `Alumnos` y `Maestros` para alinear el ORM con las migraciones existentes.
 2. Registrar las vistas de autenticacion y gestion de perfiles en `urls.py` y protegerlas con permisos adecuados.
 3. Configurar variables de correo (`EMAIL_HOST`, etc.) y agregar pruebas automatizadas para validar los flujos de registro y login.
